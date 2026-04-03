@@ -22,11 +22,11 @@ public class TaskService {
 
     // 🔹 Get logged-in user
     private User getCurrentUser() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        return userRepository.findByEmail(email)
+        var userDetails = (com.taskmanager.security.CustomUserDetails) authentication.getPrincipal();
+
+        return userRepository.findByEmail(userDetails.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 

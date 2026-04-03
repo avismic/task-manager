@@ -1,5 +1,6 @@
 package com.taskmanager.config;
 
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,6 +26,8 @@ public class SecurityConfig {
                         .disable())
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.disable()))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/users/register",
@@ -34,7 +37,7 @@ public class SecurityConfig {
                                 "/h2-console/**")
                         .permitAll()
                         .anyRequest().authenticated());
-                
+
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

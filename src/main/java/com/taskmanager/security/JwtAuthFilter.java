@@ -1,5 +1,6 @@
 package com.taskmanager.security;
 
+import com.taskmanager.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,6 +18,7 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -36,9 +38,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             String email = jwtUtil.extractEmail(token);
 
-            if (email != null) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, null,
-                        Collections.emptyList());
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                var userDetails = userDetailsService.loadUserByUsername(email);
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
