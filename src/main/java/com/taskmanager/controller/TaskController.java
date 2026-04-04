@@ -24,8 +24,12 @@ public class TaskController {
 
     // 🔹 Get My Tasks
     @GetMapping
-    public List<TaskResponseDTO> getMyTasks() {
-        return taskService.getMyTasks();
+    public List<TaskResponseDTO> getMyTasks(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Boolean completed,
+            @RequestParam(required = false) String search) {
+
+        return taskService.getMyTasks(status, completed, search);
     }
 
     // 🔹 Get Task by ID

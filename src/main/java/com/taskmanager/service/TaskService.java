@@ -39,6 +39,7 @@ public class TaskService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .completed(false)
+                .status(com.taskmanager.entity.TaskStatus.TODO)
                 .user(user)
                 .build();
 
@@ -107,12 +108,47 @@ public class TaskService {
     }
 
     // 🔹 Get all tasks of logged-in user
-    public List<TaskResponseDTO> getMyTasks() {
+    public List<TaskResponseDTO> getMyTasks(String status, Boolean completed, String search) {
 
         User user = getCurrentUser();
 
-        return taskRepository.findByUser(user)
-                .stream()
+        List<Task> tasks;
+
+        // 🔍 Case 0: search (highest priority)
+        if (search != null && !search.isBlank()) {
+            tasks = taskRepository
+                    .findByUserAndTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                            user,
+                            search,
+                            search);
+        }
+
+        // Case 1: both filters present
+        if (status != null && completed != null) {
+            tasks = taskRepository.findByUserAndStatusAndCompleted(
+                    user,
+                    com.taskmanager.entity.TaskStatus.valueOf(status.toUpperCase()),
+                    completed);
+        }
+        // Case 2: only status
+        else if (status != null) {
+            tasks = taskRepository.findByUserAndStatus(
+                    user,
+                    com.taskmanager.entity.TaskStatus.valueOf(status.toUpperCase()));
+        }
+        // Case 3: only completed
+        else if (completed != null) {
+            tasks = taskRepository.findByUser(user)
+                    .stream()
+                    .filter(task -> task.isCompleted() == completed)
+                    .toList();
+        }
+        // Case 4: no filters
+        else {
+            tasks = taskRepository.findByUser(user);
+        }
+
+        return tasks.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -140,6 +176,7 @@ public class TaskService {
                 .title(task.getTitle())
                 .description(task.getDescription())
                 .completed(task.isCompleted())
+                .status(task.getStatus().name())
                 .build();
     }
 }
