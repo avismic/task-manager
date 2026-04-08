@@ -1068,27 +1068,31 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import io.swagger.v3.oas.models.info.Contact;
 
 @Configuration
 public class SwaggerConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
+        @Bean
+        public OpenAPI customOpenAPI() {
 
-        return new OpenAPI()
-                .info(new Info()
-                        .title("Task Manager API")
-                        .version("1.0")
-                        .description("Task Manager with JWT Authentication"))
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                .components(new io.swagger.v3.oas.models.Components()
-                        .addSecuritySchemes("bearerAuth",
-                                new SecurityScheme()
-                                        .name("Authorization")
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")));
-    }
+                return new OpenAPI()
+                                .info(new Info()
+                                                .title("Task Manager API")
+                                                .version("1.0")
+                                                .description("Production-grade Task Management API with JWT Authentication, built using Spring Boot")
+                                                .contact(new Contact()
+                                                                .name("Abhishek Anand")
+                                                                .email("your-email@example.com")))
+                                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                                .components(new io.swagger.v3.oas.models.Components()
+                                                .addSecuritySchemes("bearerAuth",
+                                                                new SecurityScheme()
+                                                                                .name("Authorization")
+                                                                                .type(SecurityScheme.Type.HTTP)
+                                                                                .scheme("bearer")
+                                                                                .bearerFormat("JWT")));
+        }
 }
 
 
@@ -1103,39 +1107,47 @@ import com.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
+@Tag(name = "Task Management", description = "APIs for managing user tasks")
 public class TaskController {
 
     private final TaskService taskService;
 
     // ðŸ”¹ Create Task
+    @Operation(summary = "Create a new task", description = "Creates a task for the logged-in user")
     @PostMapping
     public TaskResponseDTO createTask(@Valid @RequestBody TaskRequestDTO request) {
         return taskService.createTask(request);
     }
 
     // ðŸ”¹ Get My Tasks
+    @Operation(summary = "Get all tasks", description = "Fetch tasks with optional filters (status, completed, search)")
     @GetMapping
     public List<TaskResponseDTO> getMyTasks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Boolean completed,
             @RequestParam(required = false) String search) {
 
-        return taskService.getMyTasks(status, completed, search);
+        return taskService.getMyTasks(page, size, status, completed, search);
     }
 
     // ðŸ”¹ Get Task by ID
+    @Operation(summary = "Get task by ID", description = "Fetch a specific task by its ID")
     @GetMapping("/{id}")
     public TaskResponseDTO getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id);
     }
 
     // ðŸ”¹ Update Task
+    @Operation(summary = "Update task", description = "Update task details by ID")
     @PutMapping("/{id}")
     public TaskResponseDTO updateTask(
             @PathVariable Long id,
@@ -1145,6 +1157,7 @@ public class TaskController {
     }
 
     // ðŸ”¹ Delete Task
+    @Operation(summary = "Delete task", description = "Delete a task by ID")
     @DeleteMapping("/{id}")
     public String deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
@@ -1152,6 +1165,7 @@ public class TaskController {
     }
 
     // ðŸ”¹ Toggle Complete
+    @Operation(summary = "Toggle task completion", description = "Mark task as completed or incomplete")
     @PatchMapping("/{id}/toggle")
     public TaskResponseDTO toggleTask(@PathVariable Long id) {
         return taskService.toggleTask(id);
@@ -1163,6 +1177,7 @@ public class TaskController {
 FILE: src/main/java/com/taskmanager/controller/UserController.java
 ================================================
 package com.taskmanager.controller;
+
 import com.taskmanager.dto.LoginResponseDTO;
 import com.taskmanager.dto.LoginRequestDTO;
 import com.taskmanager.dto.UserRequestDTO;
@@ -1171,24 +1186,30 @@ import com.taskmanager.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "APIs for user registration and login")
 public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "Register new user", description = "Creates a new user account")
     @PostMapping("/register")
     public UserResponseDTO registerUser(@Valid @RequestBody UserRequestDTO request) {
         return userService.registerUser(request);
     }
 
+    @Operation(summary = "User login", description = "Authenticates user and returns JWT token")
     @PostMapping("/login")
     public LoginResponseDTO loginUser(@Valid @RequestBody LoginRequestDTO request) {
         return userService.loginUser(request);
     }
 
+    @Operation(summary = "Test protected API", description = "Check if authentication is working")
     @GetMapping("/test")
     public String test() {
         return "Protected API working";
@@ -1575,6 +1596,8 @@ import com.taskmanager.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.taskmanager.entity.TaskStatus;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
@@ -1588,6 +1611,20 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             User user,
             String title,
             String description);
+
+    Page<Task> findByUser(User user, Pageable pageable);
+
+    Page<Task> findByUserAndStatus(User user, TaskStatus status, Pageable pageable);
+
+    Page<Task> findByUserAndStatusAndCompleted(User user, TaskStatus status, boolean completed, Pageable pageable);
+
+    Page<Task> findByUserAndTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+            User user,
+            String title,
+            String description,
+            Pageable pageable);
+
+    Page<Task> findByUserAndCompleted(User user, boolean completed, Pageable pageable);
 }
 
 
@@ -1806,7 +1843,7 @@ public class JwtUtil {
 ================================================
 FILE: src/main/java/com/taskmanager/service/TaskService.java
 ================================================
-Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x8d in position 3861: character maps to <undefined>
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x8d in position 4090: character maps to <undefined>
 
 
 ================================================

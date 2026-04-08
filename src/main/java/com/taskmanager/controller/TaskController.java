@@ -29,11 +29,13 @@ public class TaskController {
     @Operation(summary = "Get all tasks", description = "Fetch tasks with optional filters (status, completed, search)")
     @GetMapping
     public List<TaskResponseDTO> getMyTasks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Boolean completed,
             @RequestParam(required = false) String search) {
 
-        return taskService.getMyTasks(status, completed, search);
+        return taskService.getMyTasks(page, size, status, completed, search);
     }
 
     // 🔹 Get Task by ID

@@ -11,7 +11,9 @@ import com.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,51 +112,53 @@ public class TaskService {
     }
 
     // 🔹 Get all tasks of logged-in user
-    public List<TaskResponseDTO> getMyTasks(String status, Boolean completed, String search) {
+    public List<TaskResponseDTO> getMyTasks(int page, int size, String status, Boolean completed, String search) {
 
         User user = getCurrentUser();
 
-        List<Task> tasks;
+        Pageable pageable = PageRequest.of(page, size);
 
-        // 🔍 Case 0: search (highest priority)
+        Page<Task> taskPage;
+
+        // 🔍 Case 1: Search (highest priority)
         if (search != null && !search.isBlank()) {
-            tasks = taskRepository
+            taskPage = taskRepository
                     .findByUserAndTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
                             user,
                             search,
-                            search);
-
-            return tasks.stream()
-                    .map(this::mapToResponse)
-                    .collect(Collectors.toList());
+                            search,
+                            pageable);
         }
 
-        // Case 1: both filters present
-        if (status != null && completed != null) {
-            tasks = taskRepository.findByUserAndStatusAndCompleted(
+        // Case 2: status + completed
+        else if (status != null && completed != null) {
+            taskPage = taskRepository.findByUserAndStatusAndCompleted(
                     user,
                     com.taskmanager.entity.TaskStatus.valueOf(status.toUpperCase()),
-                    completed);
-        }
-        // Case 2: only status
-        else if (status != null) {
-            tasks = taskRepository.findByUserAndStatus(
-                    user,
-                    com.taskmanager.entity.TaskStatus.valueOf(status.toUpperCase()));
-        }
-        // Case 3: only completed
-        else if (completed != null) {
-            tasks = taskRepository.findByUser(user)
-                    .stream()
-                    .filter(task -> task.isCompleted() == completed)
-                    .toList();
-        }
-        // Case 4: no filters
-        else {
-            tasks = taskRepository.findByUser(user);
+                    completed,
+                    pageable);
         }
 
-        return tasks.stream()
+        // Case 3: only status
+        else if (status != null) {
+            taskPage = taskRepository.findByUserAndStatus(
+                    user,
+                    com.taskmanager.entity.TaskStatus.valueOf(status.toUpperCase()),
+                    pageable);
+        }
+
+        // Case 4: only completed
+        else if (completed != null) {
+            taskPage = taskRepository.findByUserAndCompleted(user, completed, pageable);
+        }
+
+        // Case 5: no filters
+        else {
+            taskPage = taskRepository.findByUser(user, pageable);
+        }
+
+        return taskPage.getContent()
+                .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
