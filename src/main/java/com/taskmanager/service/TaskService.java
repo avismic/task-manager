@@ -4,6 +4,8 @@ import com.taskmanager.dto.TaskRequestDTO;
 import com.taskmanager.dto.TaskResponseDTO;
 import com.taskmanager.entity.Task;
 import com.taskmanager.entity.User;
+import com.taskmanager.exception.ResourceNotFoundException;
+import com.taskmanager.exception.UnauthorizedException;
 import com.taskmanager.repository.TaskRepository;
 import com.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,7 @@ public class TaskService {
         var userDetails = (com.taskmanager.security.CustomUserDetails) authentication.getPrincipal();
 
         return userRepository.findByEmail(userDetails.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     // 🔹 Create Task
@@ -54,11 +56,11 @@ public class TaskService {
         User user = getCurrentUser();
 
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         // 🔒 Ownership check
         if (!task.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Unauthorized access");
+            throw new UnauthorizedException("You are not allowed to access this resource");
         }
 
         // 🔄 Update fields
@@ -76,11 +78,11 @@ public class TaskService {
         User user = getCurrentUser();
 
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         // 🔒 Ownership check
         if (!task.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Unauthorized access");
+            throw new UnauthorizedException("You are not allowed to access this resource");
         }
 
         taskRepository.delete(task);
@@ -92,11 +94,11 @@ public class TaskService {
         User user = getCurrentUser();
 
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         // 🔒 Ownership check
         if (!task.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Unauthorized access");
+            throw new UnauthorizedException("You are not allowed to access this resource");
         }
 
         // 🔄 Toggle
@@ -121,6 +123,10 @@ public class TaskService {
                             user,
                             search,
                             search);
+
+            return tasks.stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
         }
 
         // Case 1: both filters present
@@ -159,11 +165,11 @@ public class TaskService {
         User user = getCurrentUser();
 
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
         // 🔒 Ownership check
         if (!task.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Unauthorized access");
+            throw new UnauthorizedException("You are not allowed to access this resource");
         }
 
         return mapToResponse(task);
