@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -28,7 +29,7 @@ public class TaskController {
     // 🔹 Get My Tasks
     @Operation(summary = "Get all tasks", description = "Fetch tasks with optional filters (status, completed, search)")
     @GetMapping
-    public List<TaskResponseDTO> getMyTasks(
+    public org.springframework.data.domain.Page<TaskResponseDTO> getMyTasks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String status,

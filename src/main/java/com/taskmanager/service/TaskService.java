@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -112,7 +111,7 @@ public class TaskService {
     }
 
     // 🔹 Get all tasks of logged-in user
-    public List<TaskResponseDTO> getMyTasks(int page, int size, String status, Boolean completed, String search) {
+    public Page<TaskResponseDTO> getMyTasks(int page, int size, String status, Boolean completed, String search) {
 
         User user = getCurrentUser();
 
@@ -157,10 +156,7 @@ public class TaskService {
             taskPage = taskRepository.findByUser(user, pageable);
         }
 
-        return taskPage.getContent()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return taskPage.map(this::mapToResponse);
     }
 
     // 🔹 Get single task by ID (with ownership check)

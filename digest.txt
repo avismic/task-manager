@@ -1110,6 +1110,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -1129,7 +1130,7 @@ public class TaskController {
     // ðŸ”¹ Get My Tasks
     @Operation(summary = "Get all tasks", description = "Fetch tasks with optional filters (status, completed, search)")
     @GetMapping
-    public List<TaskResponseDTO> getMyTasks(
+    public org.springframework.data.domain.Page<TaskResponseDTO> getMyTasks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String status,
@@ -1843,7 +1844,7 @@ public class JwtUtil {
 ================================================
 FILE: src/main/java/com/taskmanager/service/TaskService.java
 ================================================
-Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x8d in position 4090: character maps to <undefined>
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x8d in position 4053: character maps to <undefined>
 
 
 ================================================
@@ -1925,7 +1926,9 @@ spring.jpa.hibernate.ddl-auto=update
 spring.h2.console.enabled=true
 spring.h2.console.settings.web-allow-others=true
 
-jwt.secret=mysecretkeymysecretkeymysecretkey
+jwt.secret=${JWT_SECRET:mysecretkeymysecretkeymysecretkey}
+
+server.port=9090
 
 
 ================================================
