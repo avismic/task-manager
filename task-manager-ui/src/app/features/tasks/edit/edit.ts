@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from '../../../core/services/task.service';
 import { Task } from '../../../models/task.model';
-
+import { switchMap, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-edit',
@@ -10,36 +10,27 @@ import { Task } from '../../../models/task.model';
   styleUrl: './edit.css',
   standalone: false,
 })
-export class Edit implements OnInit {
+export class Edit {
   taskId!: number;
-  task!: Task;
-
+  task$!: Observable<Task>;
   constructor(
     private route: ActivatedRoute,
     private taskService: TaskService,
-    private cdr: ChangeDetectorRef,
     private router: Router,
-  ) {}
-
-  ngOnInit(): void {
-    this.taskId = Number(this.route.snapshot.paramMap.get('id'));
-
-    this.taskService.getTaskById(this.taskId).subscribe({
-      next: (res) => {
-        console.log('Task fetched:', res);
-        this.task = res;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error fetching task:', err);
-      },
-    });
+  ) {
+    this.task$ = this.route.paramMap.pipe(
+      switchMap((params) => {
+        const id = Number(params.get('id'));
+        this.taskId = id;
+        return this.taskService.getTaskById(id);
+      }),
+    );
   }
 
-  onSubmit() {
+  onSubmit(task: Task) {
     const data = {
-      title: this.task.title,
-      description: this.task.description,
+      title: task.title,
+      description: task.description,
     };
 
     this.taskService.updateTask(this.taskId, data).subscribe({

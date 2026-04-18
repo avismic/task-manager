@@ -1,8 +1,8 @@
 <h2>Edit Task</h2>
 
-<div *ngIf="task as t">
+<div *ngIf="task$ | async as t">
 
-  <form (ngSubmit)="onSubmit()">
+  <form (ngSubmit)="onSubmit(t)">
 
     <div>
       <label>Title:</label>
