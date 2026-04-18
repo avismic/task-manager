@@ -33,4 +33,12 @@ export class AuthService {
   register(data: { name: string; email: string; password: string }) {
     return this.http.post(`${this.baseUrl}/register`, data);
   }
+
+  updateName(data: { name: string }) {
+    return this.http.put(`${this.baseUrl}/name`, data);
+  }
+
+  changePassword(data: { oldPassword: string; newPassword: string }) {
+    return this.http.put(`${this.baseUrl}/password`, data, { responseType: 'text' });
+  }
 }

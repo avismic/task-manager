@@ -1,6 +1,8 @@
 package com.taskmanager.controller;
 
 import com.taskmanager.dto.LoginResponseDTO;
+import com.taskmanager.dto.UpdateNameRequestDTO;
+import com.taskmanager.dto.ChangePasswordRequestDTO;
 import com.taskmanager.dto.LoginRequestDTO;
 import com.taskmanager.dto.UserRequestDTO;
 import com.taskmanager.dto.UserResponseDTO;
@@ -35,5 +37,24 @@ public class UserController {
     @GetMapping("/test")
     public String test() {
         return "Protected API working";
+    }
+
+    @Operation(summary = "Get current user", description = "Fetch logged-in user details")
+    @GetMapping("/me")
+    public UserResponseDTO getCurrentUser() {
+        return userService.getCurrentUser();
+    }
+
+    @Operation(summary = "Update user name", description = "Update logged-in user's name")
+    @PutMapping("/name")
+    public UserResponseDTO updateName(@Valid @RequestBody UpdateNameRequestDTO request) {
+        return userService.updateName(request);
+    }
+
+    @Operation(summary = "Change password", description = "Change user password with old password validation")
+    @PutMapping("/password")
+    public String changePassword(@Valid @RequestBody ChangePasswordRequestDTO request) {
+        userService.changePassword(request);
+        return "Password updated successfully";
     }
 }

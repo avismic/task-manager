@@ -1,8 +1,11 @@
 package com.taskmanager.service;
 
 import com.taskmanager.dto.LoginResponseDTO;
+import com.taskmanager.dto.UpdateNameRequestDTO;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.taskmanager.security.JwtUtil;
+import com.taskmanager.dto.ChangePasswordRequestDTO;
 import com.taskmanager.dto.LoginRequestDTO;
 import com.taskmanager.dto.UserRequestDTO;
 import com.taskmanager.dto.UserResponseDTO;
@@ -57,5 +60,64 @@ public class UserService {
                 .email(user.getEmail())
                 .build();
 
+    }
+
+    public UserResponseDTO getCurrentUser() {
+
+        String email = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
+    }
+
+    public UserResponseDTO updateName(UpdateNameRequestDTO request) {
+
+        String email = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.setName(request.getName());
+
+        User updatedUser = userRepository.save(user);
+
+        return UserResponseDTO.builder()
+                .id(updatedUser.getId())
+                .name(updatedUser.getName())
+                .email(updatedUser.getEmail())
+                .build();
+    }
+
+    public void changePassword(ChangePasswordRequestDTO request) {
+
+        String email = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Validate old password
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
+
+        // Set new password (encoded)
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.save(user);
     }
 }
