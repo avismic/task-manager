@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
@@ -103,7 +104,22 @@ public class TaskService {
         }
 
         // 🔄 Toggle
-        task.setCompleted(!task.isCompleted());
+        switch (task.getStatus()) {
+            case TODO:
+                task.setStatus(com.taskmanager.entity.TaskStatus.IN_PROGRESS);
+                task.setCompleted(false);
+                break;
+
+            case IN_PROGRESS:
+                task.setStatus(com.taskmanager.entity.TaskStatus.DONE);
+                task.setCompleted(true);
+                break;
+
+            case DONE:
+                task.setStatus(com.taskmanager.entity.TaskStatus.TODO);
+                task.setCompleted(false);
+                break;
+        }
 
         Task updatedTask = taskRepository.save(task);
 
@@ -111,12 +127,24 @@ public class TaskService {
     }
 
     // 🔹 Get all tasks of logged-in user
-    public Page<TaskResponseDTO> getMyTasks(int page, int size, String status, Boolean completed, String search) {
+    public Page<TaskResponseDTO> getMyTasks(int page, int size, String sort, String status, Boolean completed,
+            String search) {
 
         User user = getCurrentUser();
 
-        Pageable pageable = PageRequest.of(page, size);
+        String[] sortParts = sort.split(",");
 
+        String field = sortParts[0];
+        String direction = sortParts.length > 1 ? sortParts[1] : "asc";
+
+        Sort.Direction dir = direction.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        PageRequest pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(dir, field));
         Page<Task> taskPage;
 
         // 🔍 Case 1: Search (highest priority)

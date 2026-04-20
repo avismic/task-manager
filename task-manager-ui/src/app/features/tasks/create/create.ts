@@ -12,6 +12,7 @@ import { Subject } from 'rxjs';
 export class Create {
   title = '';
   description = '';
+  isLoading: boolean = false;
 
   constructor(
     private taskService: TaskService,
@@ -19,14 +20,27 @@ export class Create {
   ) {}
 
   onSubmit() {
+    if (this.isLoading) return;
+
+    this.isLoading = true;
+
     const data = {
       title: this.title,
       description: this.description,
     };
 
     this.taskService.createTask(data).subscribe({
-      next: () => this.router.navigate(['/tasks']),
-      error: (err) => console.error(err),
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/tasks']);
+      },
+      error: () => {
+        this.isLoading = false;
+      },
     });
+  }
+
+  goBack() {
+    window.history.back();
   }
 }

@@ -13,6 +13,8 @@ import { switchMap, Observable } from 'rxjs';
 export class Edit {
   taskId!: number;
   task$!: Observable<Task>;
+  isLoading: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private taskService: TaskService,
@@ -28,19 +30,27 @@ export class Edit {
   }
 
   onSubmit(task: Task) {
+    if (this.isLoading) return;
+
+    this.isLoading = true;
+
     const data = {
       title: task.title,
       description: task.description,
     };
 
     this.taskService.updateTask(this.taskId, data).subscribe({
-      next: (res) => {
-        console.log('Task updated:', res);
+      next: () => {
+        this.isLoading = false;
         this.router.navigate(['/tasks']);
       },
-      error: (err) => {
-        console.error('Error updating task:', err);
+      error: () => {
+        this.isLoading = false;
       },
     });
+  }
+
+  goBack() {
+    window.history.back();
   }
 }

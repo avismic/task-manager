@@ -32,11 +32,12 @@ public class TaskController {
     public org.springframework.data.domain.Page<TaskResponseDTO> getMyTasks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,desc") String sort,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Boolean completed,
             @RequestParam(required = false) String search) {
 
-        return taskService.getMyTasks(page, size, status, completed, search);
+        return taskService.getMyTasks(page, size, sort, status, completed, search);
     }
 
     // 🔹 Get Task by ID

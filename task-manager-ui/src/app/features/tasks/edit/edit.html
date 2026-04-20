@@ -1,29 +1,38 @@
-<h2>Edit Task</h2>
+<div class="login-container">
+  <div class="login-card">
+<button class="back-btn" (click)="goBack()">← Back</button>
+    <h2>Edit Task</h2>
 
-<div *ngIf="task$ | async as t">
+    <div *ngIf="task$ | async as t">
 
-  <form (ngSubmit)="onSubmit(t)">
+      <form (ngSubmit)="onSubmit(t)">
 
-    <div>
-      <label>Title:</label>
-      <input 
-        type="text" 
-        [(ngModel)]="t.title" 
-        name="title" 
-        required 
-      />
+        <div class="input-group">
+          <span class="icon">📝</span>
+          <input
+            type="text"
+            [(ngModel)]="t.title"
+            name="title"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <span class="icon">📄</span>
+          <input
+            type="text"
+            [(ngModel)]="t.description"
+            name="description"
+          />
+        </div>
+
+        <button type="submit" [disabled]="isLoading">
+          {{ isLoading ? 'Updating...' : 'Update Task' }}
+        </button>
+
+      </form>
+
     </div>
 
-    <div>
-      <label>Description:</label>
-      <textarea 
-        [(ngModel)]="t.description" 
-        name="description">
-      </textarea>
-    </div>
-
-    <button type="submit">Update Task</button>
-
-  </form>
-
+  </div>
 </div>

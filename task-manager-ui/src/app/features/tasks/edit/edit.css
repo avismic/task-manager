@@ -1,0 +1,9 @@
+@import '../../auth/login/login.css';
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #1890ff;
+  cursor: pointer;
+  margin-bottom: 10px;
+}

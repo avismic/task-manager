@@ -1,1 +1,9 @@
+<div
+  *ngIf="error$ | async as error"
+  style="background: #ffdddd; padding: 10px; margin-bottom: 10px"
+>
+  <span>{{ error }}</span>
+  <button (click)="clearError()" style="margin-left: 10px">X</button>
+</div>
+
 <router-outlet></router-outlet>

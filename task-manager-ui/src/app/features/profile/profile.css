@@ -1,0 +1,23 @@
+@import '../auth/login/login.css';
+
+.profile-info {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.profile-section {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.profile-section h3 {
+  margin-bottom: 10px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #1890ff;
+  cursor: pointer;
+  margin-bottom: 10px;
+}

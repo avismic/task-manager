@@ -1,25 +1,37 @@
-<h2>Create Task</h2>
+<div class="login-container">
+  <div class="login-card">
+    <button class="back-btn" (click)="goBack()">← Back</button>
 
-<form (ngSubmit)="onSubmit()">
+    <h2>Create Task</h2>
 
-  <div>
-    <label>Title:</label>
-    <input 
-      type="text" 
-      [(ngModel)]="title" 
-      name="title" 
-      required 
-    />
+    <form (ngSubmit)="onSubmit()">
+
+      <div class="input-group">
+        <span class="icon">📝</span>
+        <input
+          type="text"
+          [(ngModel)]="title"
+          name="title"
+          placeholder="Task title"
+          required
+        />
+      </div>
+
+      <div class="input-group">
+        <span class="icon">📄</span>
+        <input
+          type="text"
+          [(ngModel)]="description"
+          name="description"
+          placeholder="Description"
+        />
+      </div>
+
+      <button type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Creating...' : 'Create Task' }}
+      </button>
+
+    </form>
+
   </div>
-
-  <div>
-    <label>Description:</label>
-    <textarea 
-      [(ngModel)]="description" 
-      name="description">
-    </textarea>
-  </div>
-
-  <button type="submit">Create Task</button>
-
-</form>
+</div>

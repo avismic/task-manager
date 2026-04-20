@@ -46,4 +46,8 @@ export class Profile {
         error: (err) => console.error(err),
       });
   }
+
+  goBack() {
+    window.history.back();
+  }
 }

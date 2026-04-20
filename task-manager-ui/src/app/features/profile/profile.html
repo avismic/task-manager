@@ -1,21 +1,41 @@
-<h2>My Profile</h2>
+<div class="login-container">
+  <div class="login-card">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+    <h2>My Profile</h2>
 
-<div>
-  <p><strong>Name:</strong> {{ name }}</p>
-  <p><strong>Email:</strong> {{ email }}</p>
+    <!-- User Info -->
+    <div class="profile-info">
+      <p><strong>Name:</strong> {{ name }}</p>
+      <p><strong>Email:</strong> {{ email }}</p>
+    </div>
+
+    <!-- Update Name -->
+    <div class="profile-section">
+      <h3>Update Name</h3>
+
+      <div class="input-group">
+        <span class="icon">👤</span>
+        <input type="text" [(ngModel)]="newName" placeholder="Enter new name" />
+      </div>
+
+      <button (click)="updateName()">Update Name</button>
+    </div>
+
+    <!-- Change Password -->
+    <div class="profile-section">
+      <h3>Change Password</h3>
+
+      <div class="input-group">
+        <span class="icon">🔒</span>
+        <input type="password" [(ngModel)]="oldPassword" placeholder="Old Password" />
+      </div>
+
+      <div class="input-group">
+        <span class="icon">🔒</span>
+        <input type="password" [(ngModel)]="newPassword" placeholder="New Password" />
+      </div>
+
+      <button (click)="changePassword()">Change Password</button>
+    </div>
+  </div>
 </div>
-<hr />
-
-<h3>Update Name</h3>
-
-<input type="text" [(ngModel)]="newName" placeholder="Enter new name" />
-<button (click)="updateName()">Update Name</button>
-
-<hr />
-
-<h3>Change Password</h3>
-
-<input type="password" [(ngModel)]="oldPassword" placeholder="Old Password" />
-<input type="password" [(ngModel)]="newPassword" placeholder="New Password" />
-
-<button (click)="changePassword()">Change Password</button>
