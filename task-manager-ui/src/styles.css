@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
 }
@@ -31,4 +32,29 @@ body.dark .filters select {
   background: #2a2a2a;
   color: white;
   border: none;
+}
+
+.top-nav {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 18px; /* bigger */
+  font-weight: 600; /* bolder */
+  display: flex;
+  align-items: center ;
+}
+
+.back-link {
+  cursor: pointer;
+  color: #0084ff;
+  font-weight: 600;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb {
+  color: #000000;
+  margin-left: 6px;
 }

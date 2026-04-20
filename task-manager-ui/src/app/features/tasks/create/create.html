@@ -1,37 +1,25 @@
 <div class="login-container">
+  <div class="top-nav">
+    <span class="back-link" (click)="goBack()">← Tasks</span>
+    <span class="breadcrumb"> / Create</span>
+  </div>
   <div class="login-card">
-    <button class="back-btn" (click)="goBack()">← Back</button>
-
     <h2>Create Task</h2>
 
     <form (ngSubmit)="onSubmit()">
-
       <div class="input-group">
         <span class="icon">📝</span>
-        <input
-          type="text"
-          [(ngModel)]="title"
-          name="title"
-          placeholder="Task title"
-          required
-        />
+        <input type="text" [(ngModel)]="title" name="title" placeholder="Task title" required />
       </div>
 
       <div class="input-group">
         <span class="icon">📄</span>
-        <input
-          type="text"
-          [(ngModel)]="description"
-          name="description"
-          placeholder="Description"
-        />
+        <input type="text" [(ngModel)]="description" name="description" placeholder="Description" />
       </div>
 
       <button type="submit" [disabled]="isLoading">
         {{ isLoading ? 'Creating...' : 'Create Task' }}
       </button>
-
     </form>
-
   </div>
 </div>
